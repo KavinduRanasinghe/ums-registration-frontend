@@ -8,6 +8,7 @@ export default function Navbar() {
       <Link to="/students">Students</Link>
       <Link to="/allocation">Allocation</Link>
       <Link to="/course-registration">Course Registration</Link>
+      <Link to="/admin-approval">Admin Approval</Link>
     </nav>
   );
 }

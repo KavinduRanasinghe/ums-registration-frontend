@@ -1,47 +1,63 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
+import MainLayout from "../layouts/MainLayout";
+
 import Dashboard from "../pages/Dashboard";
 import StudentRegistrationPage from "../pages/StudentRegistrationPage";
 import StudentsPage from "../pages/StudentsPage";
-import Navbar from "../components/NavBar";
 import AllocationPage from "../pages/AllocationPage";
 import CourseRegistrationPage from "../pages/CourseRegistrationPage";
+import AdminApprovalPage from "../pages/AdminApprovalPage";
+import ModuleManagementPage from "../pages/ModuleManagementPage";
 
 export default function AppRoutes() {
 
   return (
+
     <BrowserRouter>
 
-    <Navbar />
+      <MainLayout>
 
-      <Routes>
+        <Routes>
 
-        <Route
-          path="/"
-          element={<Dashboard />}
-        />
+          <Route
+            path="/"
+            element={<Dashboard />}
+          />
 
-        <Route
-          path="/student-registration"
-          element={<StudentRegistrationPage />}
-        />
+          <Route
+            path="/student-registration"
+            element={<StudentRegistrationPage />}
+          />
 
-        <Route
-          path="/students"
-          element={<StudentsPage />}
-        />
+          <Route
+            path="/students"
+            element={<StudentsPage />}
+          />
 
-        <Route
-          path="/allocation"
-          element={<AllocationPage />}
-        />
+          <Route
+            path="/allocation"
+            element={<AllocationPage />}
+          />
 
-        <Route
-          path="/course-registration"
-          element={<CourseRegistrationPage />}
-        />
+          <Route
+            path="/course-registration"
+            element={<CourseRegistrationPage />}
+          />
 
-      </Routes>
+          <Route
+            path="/admin-approval"
+            element={<AdminApprovalPage />}
+          />
+
+          <Route
+            path="/modules-management"
+            element={<ModuleManagementPage />}
+          />
+
+        </Routes>
+
+      </MainLayout>
 
     </BrowserRouter>
   );
