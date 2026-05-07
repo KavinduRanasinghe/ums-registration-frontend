@@ -1,79 +1,186 @@
 import { useState } from "react";
+
+import toast from "react-hot-toast";
+
 import api from "../api/axios";
 
 export default function CourseRegistrationPage() {
 
+  // =========================
+  // STATES
+  // =========================
   const [regNo, setRegNo] = useState("");
-  const [combination, setCombination] = useState("");
+
+  const [student, setStudent] = useState(null);
+
   const [modules, setModules] = useState([]);
+
   const [selectedModules, setSelectedModules] = useState([]);
+
   const [credits, setCredits] = useState(0);
 
+  const [loading, setLoading] = useState(false);
+
+  // =========================
+  // LOAD MODULES
+  // =========================
   const loadModules = async () => {
 
     try {
 
-      const response = await api.get(
-        `/modules/by-combination?combination=${combination}&level=1`
+      if (!regNo) {
+
+        toast.error(
+          "Please enter registration number"
+        );
+
+        return;
+      }
+
+      setLoading(true);
+
+      // GET STUDENT
+      const studentResponse = await api.get(
+        `/student-registration/${regNo}`
       );
 
-      setModules(response.data);
+      const studentData = studentResponse.data;
+
+      setStudent(studentData);
+
+      // GET MODULES
+      const moduleResponse = await api.get(
+        `/modules/by-combination?combination=${studentData.assignedCombination}&level=${studentData.level}`
+      );
+
+      const loadedModules = moduleResponse.data;
+
+      setModules(loadedModules);
+
+      // AUTO SELECT COMPULSORY
+      const compulsoryModules =
+        loadedModules.filter(
+          (m) => m.compulsory
+        );
+
+      setSelectedModules(compulsoryModules);
+
+      // CALCULATE INITIAL CREDITS
+      const compulsoryCredits =
+        compulsoryModules.reduce(
+          (sum, module) =>
+            sum + module.credits,
+          0
+        );
+
+      setCredits(compulsoryCredits);
+
+      toast.success(
+        "Modules loaded successfully"
+      );
 
     } catch (error) {
+
       console.error(error);
+
+      toast.error(
+        "Failed to load modules"
+      );
+
+    } finally {
+
+      setLoading(false);
     }
   };
 
+  // =========================
+  // TOGGLE MODULE
+  // =========================
   const toggleModule = (module) => {
 
-    let updated = [...selectedModules];
+    // PREVENT REMOVING COMPULSORY
+    if (module.compulsory) return;
 
-    const exists = updated.find(
+    const exists = selectedModules.find(
       (m) => m.code === module.code
     );
 
+    let updatedModules;
+
     if (exists) {
 
-      updated = updated.filter(
-        (m) => m.code !== module.code
-      );
+      updatedModules =
+        selectedModules.filter(
+          (m) => m.code !== module.code
+        );
 
     } else {
 
-      updated.push(module);
+      updatedModules = [
+        ...selectedModules,
+        module
+      ];
     }
 
-    setSelectedModules(updated);
+    setSelectedModules(updatedModules);
 
-    const total = updated.reduce(
-      (sum, m) => sum + m.credits,
-      0
-    );
+    // UPDATE CREDITS
+    const totalCredits =
+      updatedModules.reduce(
+        (sum, m) =>
+          sum + m.credits,
+        0
+      );
 
-    setCredits(total);
+    setCredits(totalCredits);
   };
 
+  // =========================
+  // SUBMIT REGISTRATION
+  // =========================
   const submitRegistration = async () => {
 
     try {
 
-      await api.post("/course-registration", {
-        regNo,
-        moduleCodes: selectedModules.map(
-          (m) => m.code
-        )
-      });
+      // CREDIT VALIDATION
+      if (credits < 30 || credits > 33) {
 
-      alert("Course Registration Successful");
+        toast.error(
+          "Credits must be between 30 and 33"
+        );
+
+        return;
+      }
+
+      setLoading(true);
+
+      await api.post(
+        "/course-registration",
+        {
+          regNo,
+          moduleCodes:
+            selectedModules.map(
+              (m) => m.code
+            )
+        }
+      );
+
+      toast.success(
+        "Registration Successful"
+      );
 
     } catch (error) {
 
       console.error(error);
 
-      alert(
+      toast.error(
         error?.response?.data?.error ||
         "Registration Failed"
       );
+
+    } finally {
+
+      setLoading(false);
     }
   };
 
@@ -81,96 +188,307 @@ export default function CourseRegistrationPage() {
 
     <div className="min-h-screen bg-slate-100 p-6">
 
-      <div className="max-w-6xl mx-auto bg-white p-8 rounded-2xl shadow-lg">
+      <div className="max-w-7xl mx-auto bg-white rounded-2xl shadow-lg p-8">
 
-        <h1 className="text-3xl font-bold mb-6">
+        {/* HEADER */}
+        <h1 className="text-3xl font-bold mb-8">
           Course Registration
         </h1>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        {/* ========================= */}
+        {/* TOP SECTION */}
+        {/* ========================= */}
 
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+
+          {/* REGISTRATION NUMBER */}
           <input
             type="text"
             placeholder="Registration Number"
             value={regNo}
-            onChange={(e) => setRegNo(e.target.value)}
+            onChange={(e) =>
+              setRegNo(e.target.value)
+            }
             className="border p-3 rounded-lg"
           />
 
-          <select
-            value={combination}
-            onChange={(e) => setCombination(e.target.value)}
-            className="border p-3 rounded-lg"
-          >
-            <option value="">Select Combination</option>
-            <option value="COMB1">COMB1</option>
-            <option value="COMB2">COMB2</option>
-            <option value="COMB3">COMB3</option>
-          </select>
-
+          {/* LOAD MODULES BUTTON */}
           <button
             onClick={loadModules}
-            className="bg-slate-900 text-white rounded-lg"
+            disabled={loading}
+            className={`rounded-lg text-white transition ${
+              loading
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-slate-900 hover:bg-slate-700"
+            }`}
           >
-            Load Modules
+            {
+              loading
+                ? "Loading..."
+                : "Load Modules"
+            }
           </button>
 
         </div>
 
-        <div className="mb-6">
+        {/* ========================= */}
+        {/* AVAILABLE MODULES */}
+        {/* ========================= */}
 
-          <h2 className="text-xl font-bold mb-3">
-            Available Modules
-          </h2>
+        <h2 className="text-2xl font-bold mb-6">
+          Available Modules
+        </h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {
+          modules.length === 0 ? (
 
-            {
-              modules.map((module) => (
+            <div className="bg-slate-50 border rounded-xl p-10 text-center text-gray-500">
+              No modules loaded
+            </div>
 
-                <div
-                  key={module.code}
-                  className="border rounded-xl p-4 flex justify-between items-center"
-                >
+          ) : (
 
-                  <div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
-                    <h3 className="font-bold">
-                      {module.code}
-                    </h3>
+              {
+                modules.map((module) => {
 
-                    <p>{module.name}</p>
+                  const checked =
+                    selectedModules.find(
+                      (m) =>
+                        m.code === module.code
+                    );
 
-                    <p className="text-sm text-gray-500">
-                      {module.credits} Credits
-                    </p>
+                  return (
 
-                  </div>
+                    <div
+                      key={module.code}
+                      className="border rounded-xl p-5 flex justify-between items-start bg-slate-50"
+                    >
 
-                  <input
-                    type="checkbox"
-                    onChange={() => toggleModule(module)}
-                  />
+                      <div>
+
+                        <h3 className="font-bold text-lg">
+                          {module.code}
+                        </h3>
+
+                        <p>{module.name}</p>
+
+                        <p className="text-sm text-gray-500 mt-1">
+                          {module.credits} Credits
+                        </p>
+
+                        <p className="text-sm text-blue-600 mt-1">
+                          Semester {module.semester}
+                        </p>
+
+                        {
+                          module.compulsory && (
+
+                            <span className="inline-block mt-2 bg-green-100 text-green-700 text-xs px-3 py-1 rounded-full">
+                              Compulsory
+                            </span>
+                          )
+                        }
+
+                      </div>
+
+                      {/* CHECKBOX */}
+                      <input
+                        type="checkbox"
+                        checked={!!checked}
+                        disabled={
+                          module.compulsory ||
+                          loading
+                        }
+                        onChange={() =>
+                          toggleModule(module)
+                        }
+                        className="w-5 h-5"
+                      />
+
+                    </div>
+                  );
+                })
+              }
+
+            </div>
+          )
+        }
+
+        {/* ========================= */}
+        {/* REGISTRATION SUMMARY */}
+        {/* ========================= */}
+
+        {
+          student && (
+
+            <div className="mt-10 bg-slate-50 border rounded-2xl p-6">
+
+              <h2 className="text-2xl font-bold mb-6">
+                Registration Summary
+              </h2>
+
+              {/* STUDENT DETAILS */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+
+                <div>
+
+                  <p className="text-gray-500 text-sm">
+                    Registration Number
+                  </p>
+
+                  <h3 className="font-semibold text-lg">
+                    {student.regNo}
+                  </h3>
 
                 </div>
-              ))
-            }
+
+                <div>
+
+                  <p className="text-gray-500 text-sm">
+                    Student Name
+                  </p>
+
+                  <h3 className="font-semibold text-lg">
+                    {student.name}
+                  </h3>
+
+                </div>
+
+                <div>
+
+                  <p className="text-gray-500 text-sm">
+                    Assigned Combination
+                  </p>
+
+                  <h3 className="font-semibold text-lg">
+                    {student.assignedCombination}
+                  </h3>
+
+                </div>
+
+                <div>
+
+                  <p className="text-gray-500 text-sm">
+                    Level
+                  </p>
+
+                  <h3 className="font-semibold text-lg">
+                    {student.level}
+                  </h3>
+
+                </div>
+
+              </div>
+
+              {/* SELECTED MODULES TABLE */}
+              <div className="overflow-x-auto">
+
+                <table className="w-full border-collapse">
+
+                  <thead>
+
+                    <tr className="bg-slate-900 text-white">
+
+                      <th className="p-3 text-left">
+                        Module Code
+                      </th>
+
+                      <th className="p-3 text-left">
+                        Module Name
+                      </th>
+
+                      <th className="p-3 text-left">
+                        Credits
+                      </th>
+
+                    </tr>
+
+                  </thead>
+
+                  <tbody>
+
+                    {
+                      selectedModules.map((module) => (
+
+                        <tr
+                          key={module.code}
+                          className="border-b"
+                        >
+
+                          <td className="p-3">
+                            {module.code}
+                          </td>
+
+                          <td className="p-3">
+                            {module.name}
+                          </td>
+
+                          <td className="p-3">
+                            {module.credits}
+                          </td>
+
+                        </tr>
+                      ))
+                    }
+
+                  </tbody>
+
+                </table>
+
+              </div>
+
+            </div>
+          )
+        }
+
+        {/* ========================= */}
+        {/* CREDIT DISPLAY */}
+        {/* ========================= */}
+
+        <div className="mt-8 flex items-center justify-between">
+
+          <div>
+
+            <h2
+              className={`text-3xl font-bold ${
+                credits >= 30 &&
+                credits <= 33
+                  ? "text-green-600"
+                  : "text-red-600"
+              }`}
+            >
+              Total Credits: {credits}
+            </h2>
+
+            <p className="text-gray-500 mt-2">
+              Valid range: 30 - 33
+            </p>
 
           </div>
 
-        </div>
-
-        <div className="flex justify-between items-center">
-
-          <h2 className="text-2xl font-bold">
-            Total Credits: {credits}
-          </h2>
-
+          {/* SUBMIT BUTTON */}
           <button
             onClick={submitRegistration}
-            className="bg-green-600 text-white px-6 py-3 rounded-lg"
+            disabled={
+              credits < 30 ||
+              credits > 33 ||
+              loading
+            }
+            className={`px-8 py-4 rounded-xl text-white font-semibold transition ${
+              credits >= 30 &&
+              credits <= 33 &&
+              !loading
+                ? "bg-green-600 hover:bg-green-700"
+                : "bg-gray-400 cursor-not-allowed"
+            }`}
           >
-            Submit Registration
+            {
+              loading
+                ? "Submitting..."
+                : "Submit Registration"
+            }
           </button>
 
         </div>

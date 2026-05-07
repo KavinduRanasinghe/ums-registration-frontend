@@ -37,14 +37,29 @@ export default function Sidebar() {
     },
 
     {
-        name: "Modules",
-        path: "/modules-management"
+      name: "Modules Management",
+      path: "/modules-management"
     }
   ];
 
   return (
 
-   <div className="w-72 h-screen overflow-y-auto bg-slate-900 text-white p-6">
+    <div
+      className="
+        fixed
+        top-0
+        left-0
+        h-screen
+        w-72
+        bg-slate-900
+        text-white
+        p-6
+        shadow-2xl
+        z-50
+        flex
+        flex-col
+      "
+    >
 
       {/* LOGO */}
       <div className="mb-10">
@@ -60,7 +75,7 @@ export default function Sidebar() {
       </div>
 
       {/* MENU */}
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-3">
 
         {
           menuItems.map((item) => (
@@ -68,9 +83,9 @@ export default function Sidebar() {
             <Link
               key={item.path}
               to={item.path}
-              className={`px-4 py-3 rounded-xl transition ${
+              className={`px-4 py-3 rounded-xl transition duration-200 ${
                 location.pathname === item.path
-                  ? "bg-white text-slate-900 font-semibold"
+                  ? "bg-white text-slate-900 font-semibold shadow"
                   : "hover:bg-slate-800"
               }`}
             >
@@ -78,6 +93,15 @@ export default function Sidebar() {
             </Link>
           ))
         }
+
+      </div>
+
+      {/* FOOTER */}
+      <div className="mt-auto pt-6 border-t border-slate-700">
+
+        <p className="text-xs text-slate-400">
+          UMS Registration System
+        </p>
 
       </div>
 
