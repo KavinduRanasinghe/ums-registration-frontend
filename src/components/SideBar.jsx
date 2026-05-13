@@ -46,20 +46,19 @@ export default function Sidebar() {
 
     <div
       className="
-        fixed
+        sticky
         top-0
-        left-0
         h-screen
         w-72
+        shrink-0
         bg-slate-900
         text-white
         p-6
         shadow-2xl
-        z-50
         flex
         flex-col
-      "
-    >
+  "
+>
 
       {/* LOGO */}
       <div className="mb-10">
