@@ -1,28 +1,41 @@
-import { useEffect, useState } from "react";
+import {
+  useEffect,
+  useState
+} from "react";
+
+import {
+  Link
+} from "react-router-dom";
+
 import api from "../api/axios";
 
 export default function StudentsPage() {
 
-  // =========================
+  // =====================================
   // STATES
-  // =========================
-  const [students, setStudents] = useState([]);
+  // =====================================
 
-  const [search, setSearch] = useState("");
+  const [students, setStudents] =
+    useState([]);
+
+  const [search, setSearch] =
+    useState("");
 
   const [filteredStudents, setFilteredStudents] =
     useState([]);
 
-  // =========================
+  // =====================================
   // FETCH STUDENTS
-  // =========================
+  // =====================================
+
   const fetchStudents = async () => {
 
     try {
 
-      const response = await api.get(
-        "/student-registration"
-      );
+      const response =
+        await api.get(
+          "/student-registration"
+        );
 
       setStudents(response.data);
 
@@ -35,12 +48,15 @@ export default function StudentsPage() {
   };
 
   useEffect(() => {
+
     fetchStudents();
+
   }, []);
 
-  // =========================
+  // =====================================
   // SEARCH FILTER
-  // =========================
+  // =====================================
+
   useEffect(() => {
 
     const filtered = students.filter(
@@ -48,218 +64,395 @@ export default function StudentsPage() {
 
         student.regNo
           ?.toLowerCase()
-          .includes(search.toLowerCase())
+          .includes(
+            search.toLowerCase()
+          )
 
         ||
 
         student.name
           ?.toLowerCase()
-          .includes(search.toLowerCase())
+          .includes(
+            search.toLowerCase()
+          )
     );
 
     setFilteredStudents(filtered);
 
   }, [search, students]);
 
+  // =====================================
+  // UI
+  // =====================================
+
   return (
 
     <div className="min-h-screen bg-slate-100 p-6">
 
-      <div className="max-w-[1600px] mx-auto bg-white rounded-2xl shadow-lg p-8">
+      <div className="max-w-[1700px] mx-auto">
 
+        {/* ================================= */}
         {/* HEADER */}
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
+        {/* ================================= */}
 
-          <div>
+        <div className="bg-white rounded-2xl shadow-lg p-8 mb-8">
 
-            <h1 className="text-3xl font-bold">
-              Students
-            </h1>
+          <div
+            className="
+              flex
+              flex-col
+              lg:flex-row
+              lg:items-center
+              lg:justify-between
+              gap-6
+            "
+          >
 
-            <p className="text-gray-500 mt-2">
-              Registered student details
-            </p>
+            <div>
+
+              <h1 className="text-4xl font-bold">
+                Students
+              </h1>
+
+              <p className="text-slate-500 mt-2">
+                Registered Student Management
+              </p>
+
+            </div>
+
+            {/* SEARCH */}
+
+            <input
+              type="text"
+
+              placeholder="Search by reg no or name..."
+
+              value={search}
+
+              onChange={(e) =>
+                setSearch(e.target.value)
+              }
+
+              className="
+                border
+                p-3
+                rounded-xl
+                w-full
+                lg:w-96
+              "
+            />
 
           </div>
 
-          {/* SEARCH */}
-          <input
-            type="text"
-            placeholder="Search by regNo or name..."
-            value={search}
-            onChange={(e) =>
-              setSearch(e.target.value)
-            }
-            className="border p-3 rounded-lg mt-4 md:mt-0 w-full md:w-80"
-          />
-
         </div>
 
+        {/* ================================= */}
         {/* TABLE */}
-        <div className="overflow-x-auto">
+        {/* ================================= */}
 
-          <table className="w-full border-collapse text-sm">
+        <div className="bg-white rounded-2xl shadow-lg p-8">
 
-            <thead>
+          <div className="overflow-x-auto">
 
-              <tr className="bg-slate-900 text-white">
+            <table className="w-full text-sm">
 
-                <th className="p-4 text-left">
-                  Reg No
-                </th>
+              <thead>
 
-                <th className="p-4 text-left">
-                  Name
-                </th>
+                <tr className="bg-slate-900 text-white">
 
-                <th className="p-4 text-left">
-                  Initials
-                </th>
+                  <th className="p-4 text-left">
+                    Reg No
+                  </th>
 
-                <th className="p-4 text-left">
-                  Gender
-                </th>
+                  <th className="p-4 text-left">
+                    Name
+                  </th>
 
-                <th className="p-4 text-left">
-                  District
-                </th>
+                  <th className="p-4 text-left">
+                    Initials
+                  </th>
 
-                <th className="p-4 text-left">
-                  Level
-                </th>
+                  <th className="p-4 text-left">
+                    Gender
+                  </th>
 
-                <th className="p-4 text-left">
-                  Z-Score
-                </th>
+                  <th className="p-4 text-left">
+                    District
+                  </th>
 
-                <th className="p-4 text-left">
-                  Preference 1
-                </th>
+                  <th className="p-4 text-left">
+                    Level
+                  </th>
 
-                <th className="p-4 text-left">
-                  Preference 2
-                </th>
+                  <th className="p-4 text-left">
+                    Z-Score
+                  </th>
 
-                <th className="p-4 text-left">
-                  Preference 3
-                </th>
+                  <th className="p-4 text-left">
+                    Preference 1
+                  </th>
 
-                <th className="p-4 text-left">
-                  Assigned Combination
-                </th>
+                  <th className="p-4 text-left">
+                    Preference 2
+                  </th>
 
-              </tr>
+                  <th className="p-4 text-left">
+                    Preference 3
+                  </th>
 
-            </thead>
+                  <th className="p-4 text-left">
+                    Assigned
+                  </th>
 
-            <tbody>
+                  <th className="p-4 text-left">
+                    Profile
+                  </th>
 
-              {
-                filteredStudents.length > 0 ? (
+                </tr>
 
-                  filteredStudents.map((student) => (
+              </thead>
 
-                    <tr
-                      key={student.id}
-                      className="border-b hover:bg-slate-50 transition"
-                    >
+              <tbody>
 
-                      <td className="p-4 font-medium">
-                        {student.regNo}
-                      </td>
+                {
+                  filteredStudents.length > 0 ? (
 
-                      <td className="p-4">
-                        {student.name}
-                      </td>
+                    filteredStudents.map((student) => (
 
-                      <td className="p-4">
-                        {student.initials}
-                      </td>
+                      <tr
+                        key={student.id}
+                        className="
+                          border-b
+                          hover:bg-slate-50
+                          transition
+                        "
+                      >
 
-                      <td className="p-4">
-                        {student.gender}
-                      </td>
+                        {/* REG NO */}
 
-                      <td className="p-4">
-                        {student.district}
-                      </td>
+                        <td className="p-4 font-semibold">
 
-                      <td className="p-4">
-                        {student.level}
-                      </td>
+                          {student.regNo}
 
-                      <td className="p-4">
-                        {student.zscore}
-                      </td>
+                        </td>
 
-                      <td className="p-4">
+                        {/* NAME */}
 
-                        <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs">
-                          {student.preference1}
-                        </span>
+                        <td className="p-4">
 
-                      </td>
+                          {student.name}
 
-                      <td className="p-4">
+                        </td>
 
-                        <span className="bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-xs">
-                          {student.preference2}
-                        </span>
+                        {/* INITIALS */}
 
-                      </td>
+                        <td className="p-4">
 
-                      <td className="p-4">
+                          {student.initials}
 
-                        <span className="bg-orange-100 text-orange-700 px-3 py-1 rounded-full text-xs">
-                          {student.preference3}
-                        </span>
+                        </td>
 
-                      </td>
+                        {/* GENDER */}
 
-                      <td className="p-4">
+                        <td className="p-4">
 
-                        {
-                          student.assignedCombination ? (
+                          {student.gender}
 
-                            <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-semibold">
+                        </td>
 
-                              {
-                                student.assignedCombination
-                              }
+                        {/* DISTRICT */}
 
-                            </span>
+                        <td className="p-4">
 
-                          ) : (
+                          {student.district}
 
-                            <span className="bg-red-100 text-red-700 px-3 py-1 rounded-full text-xs">
-                              Not Assigned
-                            </span>
-                          )
-                        }
+                        </td>
+
+                        {/* LEVEL */}
+
+                        <td className="p-4">
+
+                          {student.level}
+
+                        </td>
+
+                        {/* Z SCORE */}
+
+                        <td className="p-4 font-medium">
+
+                          {student.zScore}
+
+                        </td>
+
+                        {/* PREFERENCE 1 */}
+
+                        <td className="p-4">
+
+                          <span
+                            className="
+                              bg-blue-100
+                              text-blue-700
+                              px-3
+                              py-1
+                              rounded-full
+                              text-xs
+                              font-semibold
+                            "
+                          >
+
+                            {student.preference1}
+
+                          </span>
+
+                        </td>
+
+                        {/* PREFERENCE 2 */}
+
+                        <td className="p-4">
+
+                          <span
+                            className="
+                              bg-purple-100
+                              text-purple-700
+                              px-3
+                              py-1
+                              rounded-full
+                              text-xs
+                              font-semibold
+                            "
+                          >
+
+                            {student.preference2}
+
+                          </span>
+
+                        </td>
+
+                        {/* PREFERENCE 3 */}
+
+                        <td className="p-4">
+
+                          <span
+                            className="
+                              bg-orange-100
+                              text-orange-700
+                              px-3
+                              py-1
+                              rounded-full
+                              text-xs
+                              font-semibold
+                            "
+                          >
+
+                            {student.preference3}
+
+                          </span>
+
+                        </td>
+
+                        {/* ASSIGNED */}
+
+                        <td className="p-4">
+
+                          {
+                            student.assignedCombination ? (
+
+                              <span
+                                className="
+                                  bg-green-100
+                                  text-green-700
+                                  px-3
+                                  py-1
+                                  rounded-full
+                                  text-xs
+                                  font-semibold
+                                "
+                              >
+
+                                {
+                                  student.assignedCombination
+                                }
+
+                              </span>
+
+                            ) : (
+
+                              <span
+                                className="
+                                  bg-red-100
+                                  text-red-700
+                                  px-3
+                                  py-1
+                                  rounded-full
+                                  text-xs
+                                  font-semibold
+                                "
+                              >
+
+                                Not Assigned
+
+                              </span>
+                            )
+                          }
+
+                        </td>
+
+                        {/* PROFILE */}
+
+                        <td className="p-4">
+
+                          <Link
+
+                            to={`/students/${student.regNo}`}
+
+                            className="
+                              bg-slate-900
+                              text-white
+                              px-4
+                              py-2
+                              rounded-lg
+                              hover:bg-slate-700
+                              transition
+                              text-xs
+                              font-semibold
+                            "
+                          >
+
+                            View Profile
+
+                          </Link>
+
+                        </td>
+
+                      </tr>
+                    ))
+
+                  ) : (
+
+                    <tr>
+
+                      <td
+                        colSpan="12"
+                        className="
+                          text-center
+                          p-10
+                          text-slate-500
+                        "
+                      >
+
+                        No students found
 
                       </td>
 
                     </tr>
-                  ))
+                  )
+                }
 
-                ) : (
+              </tbody>
 
-                  <tr>
+            </table>
 
-                    <td
-                      colSpan="11"
-                      className="text-center p-10 text-gray-500"
-                    >
-                      No students found
-                    </td>
-
-                  </tr>
-                )
-              }
-
-            </tbody>
-
-          </table>
+          </div>
 
         </div>
 

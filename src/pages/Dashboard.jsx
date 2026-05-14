@@ -1,220 +1,446 @@
-import { useEffect, useState } from "react";
+import {
+  useEffect,
+  useState
+} from "react";
+
+import {
+  PieChart,
+  Pie,
+  Cell,
+  Tooltip,
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Legend
+} from "recharts";
+
 import api from "../api/axios";
 
 export default function Dashboard() {
 
-  const [studentCount, setStudentCount] = useState(0);
+  // =====================================
+  // STATES
+  // =====================================
 
-  const [registrations, setRegistrations] = useState([]);
+  const [stats, setStats] =
+    useState(null);
 
-  // =========================
+  const [loading, setLoading] =
+    useState(true);
+
+  // =====================================
   // LOAD DASHBOARD DATA
-  // =========================
-  const loadDashboard = async () => {
-
-    try {
-
-      // STUDENTS
-      const studentResponse = await api.get(
-        "/student-registration"
-      );
-
-      setStudentCount(
-        studentResponse.data.length
-      );
-
-      // COURSE REGISTRATIONS
-      const registrationResponse = await api.get(
-        "/course-registration"
-      );
-
-      setRegistrations(
-        registrationResponse.data
-      );
-
-    } catch (error) {
-
-      console.error(error);
-
-      alert("Failed to load dashboard");
-    }
-  };
+  // =====================================
 
   useEffect(() => {
-    loadDashboard();
+
+    loadDashboardStats();
+
   }, []);
 
-  // =========================
-  // CALCULATIONS
-  // =========================
-  const approvedCount =
-    registrations.filter(
-      (r) => r.status === "APPROVED"
-    ).length;
+  const loadDashboardStats =
+    async () => {
 
-  const pendingCount =
-    registrations.filter(
-      (r) => r.status === "PENDING"
-    ).length;
+      try {
 
-  const rejectedCount =
-    registrations.filter(
-      (r) => r.status === "REJECTED"
-    ).length;
+        const response =
+          await api.get(
+            "/dashboard/stats"
+          );
 
-  // =========================
+        setStats(response.data);
+
+      } catch (error) {
+
+        console.error(error);
+
+      } finally {
+
+        setLoading(false);
+      }
+    };
+
+  // =====================================
+  // LOADING
+  // =====================================
+
+  if (loading) {
+
+    return (
+
+      <div className="min-h-screen flex items-center justify-center">
+
+        <h1 className="text-2xl font-bold">
+          Loading Dashboard...
+        </h1>
+
+      </div>
+    );
+  }
+
+  // =====================================
+  // SAFETY
+  // =====================================
+
+  if (!stats) {
+
+    return (
+
+      <div className="min-h-screen flex items-center justify-center">
+
+        <h1 className="text-2xl font-bold text-red-600">
+          Failed to load dashboard
+        </h1>
+
+      </div>
+    );
+  }
+
+  // =====================================
+  // CHART COLORS
+  // =====================================
+
+  const COLORS = [
+    "#0f172a",
+    "#334155",
+    "#64748b"
+  ];
+
+  // =====================================
+  // SAMPLE DISTRICT DATA
+  // =====================================
+
+  const districtData = [
+
+    {
+      district: "Colombo",
+      students: 65
+    },
+
+    {
+      district: "Kandy",
+      students: 52
+    },
+
+    {
+      district: "Galle",
+      students: 40
+    },
+
+    {
+      district: "Kurunegala",
+      students: 48
+    },
+
+    {
+      district: "Jaffna",
+      students: 25
+    }
+  ];
+
+  // =====================================
   // UI
-  // =========================
+  // =====================================
+
   return (
 
     <div className="min-h-screen bg-slate-100 p-6">
 
-      <div className="max-w-7xl mx-auto">
+      {/* HEADER */}
+      <div className="mb-8">
 
-        {/* HEADER */}
-        <div className="mb-8">
+        <h1 className="text-4xl font-bold text-slate-900">
+          Dashboard
+        </h1>
 
-          <h1 className="text-4xl font-bold">
-            UMS Dashboard
-          </h1>
+        <p className="text-slate-500 mt-2">
+          University Management System Overview
+        </p>
 
-          <p className="text-gray-500 mt-2">
-            University Management System
+      </div>
+
+      {/* ================================= */}
+      {/* TOP CARDS */}
+      {/* ================================= */}
+
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
+
+        {/* TOTAL STUDENTS */}
+        <div className="bg-white rounded-2xl shadow-lg p-6">
+
+          <p className="text-slate-500 text-sm">
+            Total Students
           </p>
 
-        </div>
-
-        {/* STATS */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-
-          {/* TOTAL STUDENTS */}
-          <div className="bg-white rounded-2xl shadow-lg p-6">
-
-            <h2 className="text-gray-500 text-sm">
-              Total Students
-            </h2>
-
-            <p className="text-4xl font-bold mt-3">
-              {studentCount}
-            </p>
-
-          </div>
-
-          {/* APPROVED */}
-          <div className="bg-white rounded-2xl shadow-lg p-6">
-
-            <h2 className="text-gray-500 text-sm">
-              Approved Registrations
-            </h2>
-
-            <p className="text-4xl font-bold mt-3 text-green-600">
-              {approvedCount}
-            </p>
-
-          </div>
-
-          {/* PENDING */}
-          <div className="bg-white rounded-2xl shadow-lg p-6">
-
-            <h2 className="text-gray-500 text-sm">
-              Pending Registrations
-            </h2>
-
-            <p className="text-4xl font-bold mt-3 text-yellow-500">
-              {pendingCount}
-            </p>
-
-          </div>
-
-          {/* REJECTED */}
-          <div className="bg-white rounded-2xl shadow-lg p-6">
-
-            <h2 className="text-gray-500 text-sm">
-              Rejected Registrations
-            </h2>
-
-            <p className="text-4xl font-bold mt-3 text-red-600">
-              {rejectedCount}
-            </p>
-
-          </div>
-
-        </div>
-
-        {/* RECENT REGISTRATIONS */}
-        <div className="bg-white rounded-2xl shadow-lg p-6 mt-10">
-
-          <h2 className="text-2xl font-bold mb-6">
-            Recent Course Registrations
+          <h2 className="text-4xl font-bold mt-3">
+            {stats.totalStudents}
           </h2>
 
-          <div className="overflow-x-auto">
+        </div>
 
-            <table className="w-full border-collapse">
+        {/* ALLOCATED */}
+        <div className="bg-white rounded-2xl shadow-lg p-6">
 
-              <thead>
+          <p className="text-slate-500 text-sm">
+            Allocated Students
+          </p>
 
-                <tr className="bg-slate-900 text-white">
+          <h2 className="text-4xl font-bold text-green-600 mt-3">
+            {stats.allocatedStudents}
+          </h2>
 
-                  <th className="p-4 text-left">
-                    Student ID
-                  </th>
+        </div>
 
-                  <th className="p-4 text-left">
-                    Credits
-                  </th>
+        {/* UNALLOCATED */}
+        <div className="bg-white rounded-2xl shadow-lg p-6">
 
-                  <th className="p-4 text-left">
-                    Status
-                  </th>
+          <p className="text-slate-500 text-sm">
+            Unallocated Students
+          </p>
 
-                </tr>
+          <h2 className="text-4xl font-bold text-red-600 mt-3">
+            {stats.unallocatedStudents}
+          </h2>
 
-              </thead>
+        </div>
 
-              <tbody>
+        {/* SUCCESS RATE */}
+        <div className="bg-white rounded-2xl shadow-lg p-6">
 
-                {
-                  registrations.map((registration) => (
+          <p className="text-slate-500 text-sm">
+            Allocation Success
+          </p>
 
-                    <tr
-                      key={registration.id}
-                      className="border-b hover:bg-slate-50"
-                    >
+          <h2 className="text-4xl font-bold text-blue-600 mt-3">
 
-                      <td className="p-4">
-                        {registration.studentId}
-                      </td>
+            {
+              Math.round(
+                (
+                  stats.allocatedStudents /
+                  stats.totalStudents
+                ) * 100
+              )
+            }%
 
-                      <td className="p-4">
-                        {registration.totalCredits}
-                      </td>
+          </h2>
 
-                      <td className="p-4">
+        </div>
 
-                        <span
-                          className={`px-3 py-1 rounded-full text-sm font-medium ${
-                            registration.status === "APPROVED"
-                              ? "bg-green-100 text-green-700"
-                              : registration.status === "REJECTED"
-                              ? "bg-red-100 text-red-700"
-                              : "bg-yellow-100 text-yellow-700"
-                          }`}
-                        >
-                          {registration.status}
-                        </span>
+      </div>
 
-                      </td>
+      {/* ================================= */}
+      {/* SECOND ROW */}
+      {/* ================================= */}
 
-                    </tr>
-                  ))
-                }
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
 
-              </tbody>
+        {/* HIGHEST */}
+        <div className="bg-white rounded-2xl shadow-lg p-6">
 
-            </table>
+          <p className="text-slate-500 text-sm">
+            Highest Z-Score
+          </p>
+
+          <h2 className="text-3xl font-bold text-blue-600 mt-3">
+            {stats.highestZScore}
+          </h2>
+
+        </div>
+
+        {/* LOWEST */}
+        <div className="bg-white rounded-2xl shadow-lg p-6">
+
+          <p className="text-slate-500 text-sm">
+            Lowest Z-Score
+          </p>
+
+          <h2 className="text-3xl font-bold text-red-500 mt-3">
+            {stats.lowestZScore}
+          </h2>
+
+        </div>
+
+        {/* AVERAGE */}
+        <div className="bg-white rounded-2xl shadow-lg p-6">
+
+          <p className="text-slate-500 text-sm">
+            Average Z-Score
+          </p>
+
+          <h2 className="text-3xl font-bold text-green-600 mt-3">
+            {stats.averageZScore}
+          </h2>
+
+        </div>
+
+      </div>
+
+      {/* ================================= */}
+      {/* CHARTS */}
+      {/* ================================= */}
+
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 mb-8">
+
+        {/* PIE CHART */}
+        <div className="bg-white rounded-2xl shadow-lg p-6">
+
+          <h2 className="text-2xl font-bold mb-6">
+            Combination Distribution
+          </h2>
+
+          <div className="h-96">
+
+            <ResponsiveContainer
+              width="100%"
+              height="100%"
+            >
+
+              <PieChart>
+
+                <Pie
+                  data={stats.combinationStats}
+                  dataKey="value"
+                  nameKey="name"
+                  outerRadius={140}
+                  label
+                >
+
+                  {
+                    stats.combinationStats.map(
+                      (entry, index) => (
+
+                        <Cell
+                          key={index}
+                          fill={
+                            COLORS[index %
+                            COLORS.length]
+                          }
+                        />
+                      )
+                    )
+                  }
+
+                </Pie>
+
+                <Tooltip />
+
+              </PieChart>
+
+            </ResponsiveContainer>
 
           </div>
+
+        </div>
+
+        {/* DISTRICT CHART */}
+        <div className="bg-white rounded-2xl shadow-lg p-6">
+
+          <h2 className="text-2xl font-bold mb-6">
+            Students by District
+          </h2>
+
+          <div className="h-96">
+
+            <ResponsiveContainer
+              width="100%"
+              height="100%"
+            >
+
+              <BarChart
+                data={districtData}
+              >
+
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                />
+
+                <XAxis
+                  dataKey="district"
+                />
+
+                <YAxis />
+
+                <Tooltip />
+
+                <Legend />
+
+                <Bar
+                  dataKey="students"
+                  fill="#0f172a"
+                  radius={[8, 8, 0, 0]}
+                />
+
+              </BarChart>
+
+            </ResponsiveContainer>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      {/* ================================= */}
+      {/* CAPACITY TRACKER */}
+      {/* ================================= */}
+
+      <div className="bg-white rounded-2xl shadow-lg p-6">
+
+        <h2 className="text-2xl font-bold mb-6">
+          Combination Capacity Tracker
+        </h2>
+
+        <div className="space-y-6">
+
+          {
+            stats.combinationStats.map(
+              (combination) => (
+
+                <div
+                  key={combination.name}
+                >
+
+                  <div className="flex justify-between mb-2">
+
+                    <span className="font-semibold">
+                      {combination.name}
+                    </span>
+
+                    <span>
+
+                      {combination.value}
+                      /
+                      {combination.capacity}
+
+                    </span>
+
+                  </div>
+
+                  <div className="w-full bg-slate-200 rounded-full h-4">
+
+                    <div
+                      className="bg-slate-900 h-4 rounded-full"
+                      style={{
+                        width: `${
+
+                          (
+                            combination.value /
+                            combination.capacity
+                          ) * 100
+
+                        }%`
+                      }}
+                    />
+
+                  </div>
+
+                </div>
+              )
+            )
+          }
 
         </div>
 

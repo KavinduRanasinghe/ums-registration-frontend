@@ -1,14 +1,67 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  Navigate
+} from "react-router-dom";
 
 import MainLayout from "../layouts/MainLayout";
 
 import Dashboard from "../pages/Dashboard";
-import StudentRegistrationPage from "../pages/StudentRegistrationPage";
-import StudentsPage from "../pages/StudentsPage";
-import AllocationPage from "../pages/AllocationPage";
-import CourseRegistrationPage from "../pages/CourseRegistrationPage";
-import AdminApprovalPage from "../pages/AdminApprovalPage";
-import ModuleManagementPage from "../pages/ModuleManagementPage";
+
+import LoginPage from "../pages/LoginPage";
+
+import StudentRegistrationPage
+  from "../pages/StudentRegistrationPage";
+
+import StudentsPage
+  from "../pages/StudentsPage";
+
+import AllocationPage
+  from "../pages/AllocationPage";
+
+import CourseRegistrationPage
+  from "../pages/CourseRegistrationPage";
+
+import AdminApprovalPage
+  from "../pages/AdminApprovalPage";
+
+import ModuleManagementPage
+  from "../pages/ModuleManagementPage";
+
+import LecturerRegistrationPage 
+  from "../pages/LecturerRegistrationPage";
+
+import StudentProfilePage
+  from "../pages/StudentProfilePage";
+import LecturersPage from "../pages/LecturersPage";
+
+import LecturerProfilePage
+  from "../pages/LecturerProfilePage";
+import LecturerModuleAssignmentPage from "../pages/LecturerModuleAssignmentPage";
+
+
+// =========================================
+// PROTECTED ROUTE
+// =========================================
+
+function ProtectedRoute({ children }) {
+
+  const token =
+    localStorage.getItem("token");
+
+  if (!token) {
+
+    return <Navigate to="/login" />;
+  }
+
+  return children;
+}
+
+
+// =========================================
+// APP ROUTES
+// =========================================
 
 export default function AppRoutes() {
 
@@ -16,48 +69,170 @@ export default function AppRoutes() {
 
     <BrowserRouter>
 
-      <MainLayout>
+      <Routes>
 
-        <Routes>
+        {/* ================================= */}
+        {/* PUBLIC ROUTE */}
+        {/* ================================= */}
 
-          <Route
-            path="/"
-            element={<Dashboard />}
-          />
+        <Route
+          path="/login"
+          element={<LoginPage />}
+        />
 
-          <Route
-            path="/student-registration"
-            element={<StudentRegistrationPage />}
-          />
+        {/* ================================= */}
+        {/* PROTECTED ROUTES */}
+        {/* ================================= */}
 
-          <Route
-            path="/students"
-            element={<StudentsPage />}
-          />
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
 
-          <Route
-            path="/allocation"
-            element={<AllocationPage />}
-          />
+              <MainLayout>
 
-          <Route
-            path="/course-registration"
-            element={<CourseRegistrationPage />}
-          />
+                <Dashboard />
 
-          <Route
-            path="/admin-approval"
-            element={<AdminApprovalPage />}
-          />
+              </MainLayout>
 
-          <Route
-            path="/modules-management"
-            element={<ModuleManagementPage />}
-          />
+            </ProtectedRoute>
+          }
+        />
 
-        </Routes>
+        <Route
+          path="/student-registration"
+          element={
+            <ProtectedRoute>
 
-      </MainLayout>
+              <MainLayout>
+
+                <StudentRegistrationPage />
+
+              </MainLayout>
+
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/students"
+          element={
+            <ProtectedRoute>
+
+              <MainLayout>
+
+                <StudentsPage />
+
+              </MainLayout>
+
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/allocation"
+          element={
+            <ProtectedRoute>
+
+              <MainLayout>
+
+                <AllocationPage />
+
+              </MainLayout>
+
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/course-registration"
+          element={
+            <ProtectedRoute>
+
+              <MainLayout>
+
+                <CourseRegistrationPage />
+
+              </MainLayout>
+
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/admin-approval"
+          element={
+            <ProtectedRoute>
+
+              <MainLayout>
+
+                <AdminApprovalPage />
+
+              </MainLayout>
+
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/modules-management"
+          element={
+            <ProtectedRoute>
+
+              <MainLayout>
+
+                <ModuleManagementPage />
+
+              </MainLayout>
+
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/lecturer-registration"
+          element={
+            <ProtectedRoute>
+              <MainLayout>
+                <LecturerRegistrationPage />
+              </MainLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/students/:regNo"
+          element={<StudentProfilePage />}
+        />
+
+        <Route
+          path="/lecturers/:id"
+          element={<LecturerProfilePage />}
+        />  
+        
+        <Route
+          path="/lecturers"
+          element={<LecturersPage />}
+        />
+
+        <Route
+          path="/lecturer-module-assignment"
+          element={
+            <ProtectedRoute>
+
+              <MainLayout>
+
+                <LecturerModuleAssignmentPage />
+
+              </MainLayout>
+
+            </ProtectedRoute>
+          }
+        />
+
+      </Routes>
+
+
 
     </BrowserRouter>
   );
