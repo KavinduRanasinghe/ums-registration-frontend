@@ -103,7 +103,19 @@ export default function Sidebar() {
         {
           name: "Admin Approval",
           path: "/admin-approval"
+        },
+
+        {
+          name: "Timetable Rules",
+          path: "/timetable-rules"
+        },
+
+          {
+          name: "Generate Timetable",
+          path: "/timetable-generation"
         }
+
+
 
         
       ]

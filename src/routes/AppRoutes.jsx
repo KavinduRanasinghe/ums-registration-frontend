@@ -38,7 +38,13 @@ import LecturersPage from "../pages/LecturersPage";
 
 import LecturerProfilePage
   from "../pages/LecturerProfilePage";
-import LecturerModuleAssignmentPage from "../pages/LecturerModuleAssignmentPage";
+
+import LecturerModuleAssignmentPage 
+  from "../pages/LecturerModuleAssignmentPage";
+
+import TimeTableRulesPage 
+  from "../pages/TimeTableRulesPage";
+import TimetableGenerationPage from "../pages/TimetableGenerationPage";
 
 
 // =========================================
@@ -229,6 +235,18 @@ export default function AppRoutes() {
             </ProtectedRoute>
           }
         />
+
+         <Route
+          path="/timetable-rules"
+          element={<TimeTableRulesPage />}
+        />
+
+        <Route
+          path="/timetable-generation"
+          element={<TimetableGenerationPage />}
+        />
+
+       
 
       </Routes>
 
