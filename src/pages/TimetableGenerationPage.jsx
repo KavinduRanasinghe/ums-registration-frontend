@@ -6,8 +6,7 @@ import api from "../api/axios";
 
 export default function TimetableGenerationPage() {
 
-  const [combination, setCombination] =
-    useState("COMB1");
+
 
   const [timetable, setTimetable] =
     useState([]);
@@ -18,29 +17,28 @@ export default function TimetableGenerationPage() {
 
   const generate = async () => {
 
-    try {
+  try {
 
-      const response =
-        await api.post(
-
-          `/timetable/generate?combination=${combination}`
-        );
-
-      setTimetable(response.data);
-
-      alert(
-        "Timetable generated successfully"
+    const response =
+      await api.post(
+        "/timetable/generate"
       );
 
-    } catch (error) {
+    setTimetable(response.data);
 
-      console.error(error);
+    alert(
+      "Timetable generated successfully"
+    );
 
-      alert(
-        "Generation failed"
-      );
-    }
-  };
+  } catch (error) {
+
+    console.error(error);
+
+    alert(
+      "Generation failed"
+    );
+  }
+};
 
   // =====================================
   // UI
@@ -71,36 +69,6 @@ export default function TimetableGenerationPage() {
           {/* CONTROLS */}
 
           <div className="flex gap-4">
-
-            <select
-              value={combination}
-
-              onChange={(e) =>
-                setCombination(
-                  e.target.value
-                )
-              }
-
-              className="
-                border
-                p-3
-                rounded-xl
-              "
-            >
-
-              <option value="COMB1">
-                COMB1
-              </option>
-
-              <option value="COMB2">
-                COMB2
-              </option>
-
-              <option value="COMB3">
-                COMB3
-              </option>
-
-            </select>
 
             <button
               onClick={generate}
