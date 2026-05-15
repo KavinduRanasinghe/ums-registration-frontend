@@ -14,8 +14,17 @@ export default function LecturerModuleAssignmentPage() {
   const [lecturers, setLecturers] =
     useState([]);
 
+  const [modules, setModules] =
+    useState([]);
+
   const [assignments, setAssignments] =
     useState([]);
+
+  const [selectedLecturer, setSelectedLecturer] =
+    useState(null);
+
+  const [editingId, setEditingId] =
+    useState(null);
 
   const [formData, setFormData] =
     useState({
@@ -70,17 +79,155 @@ export default function LecturerModuleAssignmentPage() {
   };
 
   // =====================================
-  // HANDLE CHANGE
+  // HANDLE LECTURER CHANGE
   // =====================================
 
-  const handleChange = (e) => {
+  const handleLecturerChange = async (e) => {
+
+    const lecturerId =
+      e.target.value;
+
+    const lecturer =
+      lecturers.find(
+
+        (l) =>
+          l.lecturerId === lecturerId
+      );
+
+    setSelectedLecturer(lecturer);
 
     setFormData({
 
       ...formData,
 
-      [e.target.name]: e.target.value
+      lecturerId,
+
+      moduleCode: "",
+      moduleName: ""
     });
+
+    try {
+
+      const response =
+        await api.get(
+
+          `/modules/department/${lecturer.department}`
+        );
+
+      setModules(
+
+        Array.isArray(response.data)
+          ? response.data
+          : []
+      );
+
+    } catch (error) {
+
+      console.error(error);
+
+      setModules([]);
+    }
+  };
+
+  // =====================================
+  // HANDLE MODULE CHANGE
+  // =====================================
+
+  const handleModuleChange = (e) => {
+
+    const selectedModule =
+      modules.find(
+
+        (m) =>
+          m.code ===
+          e.target.value
+      );
+
+    setFormData({
+
+      ...formData,
+
+      moduleCode:
+        selectedModule.code,
+
+      moduleName:
+        selectedModule.name
+    });
+  };
+
+  // =====================================
+  // EDIT
+  // =====================================
+
+  const handleEdit = async (item) => {
+
+    setEditingId(item.id);
+
+    const lecturer =
+      lecturers.find(
+
+        (l) =>
+          l.lecturerId ===
+          item.lecturerId
+      );
+
+    setSelectedLecturer(lecturer);
+
+    try {
+
+      const response =
+        await api.get(
+
+          `/modules/department/${lecturer.department}`
+        );
+
+      setModules(response.data);
+
+    } catch (error) {
+
+      console.error(error);
+    }
+
+    setFormData({
+
+      lecturerId:
+        item.lecturerId,
+
+      moduleCode:
+        item.moduleCode,
+
+      moduleName:
+        item.moduleName
+    });
+  };
+
+  // =====================================
+  // DELETE
+  // =====================================
+
+  const handleDelete = async (id) => {
+
+    const confirmDelete =
+      window.confirm(
+        "Delete this assignment?"
+      );
+
+    if (!confirmDelete) return;
+
+    try {
+
+      await api.delete(
+        `/lecturer-modules/${id}`
+      );
+
+      loadAssignments();
+
+    } catch (error) {
+
+      console.error(error);
+
+      alert("Delete failed");
+    }
   };
 
   // =====================================
@@ -93,14 +240,32 @@ export default function LecturerModuleAssignmentPage() {
 
     try {
 
-      await api.post(
-        "/lecturer-modules",
-        formData
-      );
+      if (editingId) {
+
+        await api.put(
+
+          `/lecturer-modules/${editingId}`,
+
+          formData
+        );
+
+      } else {
+
+        await api.post(
+          "/lecturer-modules",
+          formData
+        );
+      }
 
       alert(
-        "Module assigned successfully"
+        editingId
+          ? "Assignment updated"
+          : "Module assigned successfully"
       );
+
+      // RESET
+
+      setEditingId(null);
 
       setFormData({
 
@@ -109,6 +274,10 @@ export default function LecturerModuleAssignmentPage() {
         moduleName: ""
       });
 
+      setSelectedLecturer(null);
+
+      setModules([]);
+
       loadAssignments();
 
     } catch (error) {
@@ -116,10 +285,14 @@ export default function LecturerModuleAssignmentPage() {
       console.error(error);
 
       alert(
-        "Failed to assign module"
+        "Operation failed"
       );
     }
   };
+
+  // =====================================
+  // UI
+  // =====================================
 
   return (
 
@@ -127,90 +300,261 @@ export default function LecturerModuleAssignmentPage() {
 
       <div className="max-w-7xl mx-auto">
 
+        {/* ================================= */}
         {/* FORM */}
+        {/* ================================= */}
+
         <div className="bg-white rounded-2xl shadow-lg p-8 mb-8">
 
-          <h1 className="text-3xl font-bold mb-8">
-            Lecturer Module Assignment
-          </h1>
+          <div className="mb-8">
+
+            <h1 className="text-4xl font-bold">
+              Lecturer Module Assignment
+            </h1>
+
+            <p className="text-slate-500 mt-2">
+              Assign modules based on lecturer department
+            </p>
+
+          </div>
 
           <form
             onSubmit={handleSubmit}
-            className="grid grid-cols-1 md:grid-cols-3 gap-6"
+            className="space-y-6"
           >
 
-            {/* LECTURER */}
-            <select
-              name="lecturerId"
-              value={formData.lecturerId}
-              onChange={handleChange}
-              className="border p-3 rounded-lg"
-            >
+            {/* SELECT LECTURER */}
 
-              <option value="">
+            <div>
+
+              <label className="block mb-2 font-semibold">
+
                 Select Lecturer
-              </option>
 
-              {
-                lecturers.map((lecturer) => (
+              </label>
 
-                  <option
-                    key={lecturer.id}
-                    value={lecturer.lecturerId}
-                  >
+              <select
+                name="lecturerId"
 
-                    {lecturer.fullName}
+                value={formData.lecturerId}
 
-                  </option>
-                ))
-              }
+                onChange={handleLecturerChange}
 
-            </select>
+                className="
+                  border
+                  p-3
+                  rounded-xl
+                  w-full
+                "
+              >
 
-            {/* MODULE CODE */}
-            <input
-              type="text"
-              name="moduleCode"
-              placeholder="Module Code"
-              value={formData.moduleCode}
-              onChange={handleChange}
-              className="border p-3 rounded-lg"
-            />
+                <option value="">
+                  Select Lecturer
+                </option>
 
-            {/* MODULE NAME */}
-            <input
-              type="text"
-              name="moduleName"
-              placeholder="Module Name"
-              value={formData.moduleName}
-              onChange={handleChange}
-              className="border p-3 rounded-lg"
-            />
+                {
+                  lecturers.map((lecturer) => (
+
+                    <option
+                      key={lecturer.id}
+                      value={lecturer.lecturerId}
+                    >
+
+                      {lecturer.lecturerId}
+                      {" - "}
+                      {lecturer.fullName}
+
+                    </option>
+                  ))
+                }
+
+              </select>
+
+            </div>
+
+            {/* DETAILS */}
+
+            {
+              selectedLecturer && (
+
+                <div
+                  className="
+                    grid
+                    grid-cols-1
+                    md:grid-cols-3
+                    gap-6
+                  "
+                >
+
+                  <div>
+
+                    <label className="block mb-2 font-semibold">
+                      Lecturer ID
+                    </label>
+
+                    <input
+                      type="text"
+
+                      value={selectedLecturer.lecturerId}
+
+                      disabled
+
+                      className="
+                        border
+                        p-3
+                        rounded-xl
+                        w-full
+                        bg-slate-100
+                      "
+                    />
+
+                  </div>
+
+                  <div>
+
+                    <label className="block mb-2 font-semibold">
+                      Lecturer Name
+                    </label>
+
+                    <input
+                      type="text"
+
+                      value={selectedLecturer.fullName}
+
+                      disabled
+
+                      className="
+                        border
+                        p-3
+                        rounded-xl
+                        w-full
+                        bg-slate-100
+                      "
+                    />
+
+                  </div>
+
+                  <div>
+
+                    <label className="block mb-2 font-semibold">
+                      Designation
+                    </label>
+
+                    <input
+                      type="text"
+
+                      value={selectedLecturer.designation}
+
+                      disabled
+
+                      className="
+                        border
+                        p-3
+                        rounded-xl
+                        w-full
+                        bg-slate-100
+                      "
+                    />
+
+                  </div>
+
+                </div>
+              )
+            }
+
+            {/* MODULES */}
+
+            <div>
+
+              <label className="block mb-2 font-semibold">
+
+                Subject / Module
+
+              </label>
+
+              <select
+                name="moduleCode"
+
+                value={formData.moduleCode}
+
+                onChange={handleModuleChange}
+
+                disabled={!selectedLecturer}
+
+                className="
+                  border
+                  p-3
+                  rounded-xl
+                  w-full
+                "
+              >
+
+                <option value="">
+                  Select Module
+                </option>
+
+                {
+                  modules.map((module) => (
+
+                    <option
+                      key={module.code}
+                      value={module.code}
+                    >
+
+                      {module.code}
+                      {" - "}
+                      {module.name}
+
+                    </option>
+                  ))
+                }
+
+              </select>
+
+            </div>
+
+            {/* BUTTON */}
 
             <button
               type="submit"
+
               className="
                 bg-slate-900
                 text-white
+                px-8
                 py-3
-                rounded-lg
+                rounded-xl
                 hover:bg-slate-700
                 transition
+                font-semibold
               "
             >
-              Assign Module
+
+              {
+                editingId
+                  ? "Update Assignment"
+                  : "Assign Module"
+              }
+
             </button>
 
           </form>
 
         </div>
 
+        {/* ================================= */}
         {/* TABLE */}
+        {/* ================================= */}
+
         <div className="bg-white rounded-2xl shadow-lg p-8">
 
-          <h2 className="text-2xl font-bold mb-6">
-            Assigned Modules
-          </h2>
+          <div className="mb-6">
+
+            <h2 className="text-3xl font-bold">
+              Assigned Modules
+            </h2>
+
+          </div>
 
           <div className="overflow-x-auto">
 
@@ -225,11 +569,19 @@ export default function LecturerModuleAssignmentPage() {
                   </th>
 
                   <th className="p-4 text-left">
-                    Module Code
+                    Lecturer Name
                   </th>
 
                   <th className="p-4 text-left">
-                    Module Name
+                    Designation
+                  </th>
+
+                  <th className="p-4 text-left">
+                    Subject
+                  </th>
+
+                  <th className="p-4 text-left">
+                    Actions
                   </th>
 
                 </tr>
@@ -239,33 +591,98 @@ export default function LecturerModuleAssignmentPage() {
               <tbody>
 
                 {
-                  assignments.map((item) => (
+                  assignments.map((item) => {
 
-                    <tr
-                      key={item.id}
-                      className="border-b"
-                    >
+                    const lecturer =
+                      lecturers.find(
+                        (l) =>
+                          l.lecturerId ===
+                          item.lecturerId
+                      );
 
-                      <td className="p-4">
+                    return (
 
-                        {item.lecturerId}
+                      <tr
+                        key={item.id}
+                        className="
+                          border-b
+                          hover:bg-slate-50
+                        "
+                      >
 
-                      </td>
+                        <td className="p-4 font-semibold">
+                          {item.lecturerId}
+                        </td>
 
-                      <td className="p-4">
+                        <td className="p-4">
+                          {lecturer?.fullName || "-"}
+                        </td>
 
-                        {item.moduleCode}
+                        <td className="p-4">
+                          {lecturer?.designation || "-"}
+                        </td>
 
-                      </td>
+                        <td className="p-4">
+                          {item.moduleName}
+                        </td>
 
-                      <td className="p-4">
+                        {/* ACTIONS */}
 
-                        {item.moduleName}
+                        <td className="p-4">
 
-                      </td>
+                          <div className="flex gap-3">
 
-                    </tr>
-                  ))
+                            {/* EDIT */}
+
+                            <button
+                              onClick={() =>
+                                handleEdit(item)
+                              }
+
+                              className="
+                                bg-blue-600
+                                hover:bg-blue-700
+                                text-white
+                                px-4
+                                py-2
+                                rounded-lg
+                                text-sm
+                              "
+                            >
+
+                              Edit
+
+                            </button>
+
+                            {/* DELETE */}
+
+                            <button
+                              onClick={() =>
+                                handleDelete(item.id)
+                              }
+
+                              className="
+                                bg-red-600
+                                hover:bg-red-700
+                                text-white
+                                px-4
+                                py-2
+                                rounded-lg
+                                text-sm
+                              "
+                            >
+
+                              Delete
+
+                            </button>
+
+                          </div>
+
+                        </td>
+
+                      </tr>
+                    );
+                  })
                 }
 
               </tbody>

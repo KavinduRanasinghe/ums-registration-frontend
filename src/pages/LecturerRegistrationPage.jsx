@@ -206,8 +206,8 @@ export default function LecturerRegistrationPage() {
                 IMGT
               </option>
 
-              <option value="MATH&STAT">
-                MATH&STAT
+              <option value="MATH_STAT">
+                MATH & STAT
               </option>
 
               <option value="CMIS">
