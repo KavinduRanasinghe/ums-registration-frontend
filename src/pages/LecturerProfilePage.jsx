@@ -24,29 +24,61 @@ export default function LecturerProfilePage() {
   const [lecturer, setLecturer] =
     useState(null);
 
+  const [modules, setModules] =
+    useState([]);
+
+  const [timetable, setTimetable] =
+    useState([]);
+
   const [loading, setLoading] =
     useState(true);
 
   // =====================================
-  // LOAD LECTURER
+  // LOAD DATA
   // =====================================
 
   useEffect(() => {
 
-    loadLecturer();
+    loadData();
 
   }, [lecturerId]);
 
-  const loadLecturer = async () => {
+  const loadData = async () => {
 
     try {
 
-      const response =
+      // LECTURER
+
+      const lecturerResponse =
         await api.get(
           `/lecturers/${lecturerId}`
         );
 
-      setLecturer(response.data);
+      setLecturer(
+        lecturerResponse.data
+      );
+
+      // MODULES
+
+      const moduleResponse =
+        await api.get(
+          `/lecturer-modules/${lecturerId}`
+        );
+
+      setModules(
+        moduleResponse.data
+      );
+
+      // TIMETABLE
+
+      const timetableResponse =
+        await api.get(
+          `/timetable/lecturer/${lecturerId}`
+        );
+
+      setTimetable(
+        timetableResponse.data
+      );
 
     } catch (error) {
 
@@ -104,15 +136,12 @@ export default function LecturerProfilePage() {
 
       <div className="max-w-7xl mx-auto">
 
-        {/* ================================= */}
         {/* PROFILE HEADER */}
-        {/* ================================= */}
 
         <div className="bg-white rounded-2xl shadow-lg p-8 mb-8">
 
           <div className="flex flex-col md:flex-row gap-8 items-center">
 
-            {/* PROFILE IMAGE */}
             <div
               className="
                 w-40
@@ -132,7 +161,6 @@ export default function LecturerProfilePage() {
 
             </div>
 
-            {/* BASIC DETAILS */}
             <div className="flex-1">
 
               <h1 className="text-4xl font-bold mb-3">
@@ -191,16 +219,16 @@ export default function LecturerProfilePage() {
 
         </div>
 
-        {/* ================================= */}
-        {/* PROFILE CONTENT */}
-        {/* ================================= */}
+        {/* CONTENT */}
 
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
 
-          {/* LEFT COLUMN */}
+          {/* LEFT */}
+
           <div className="space-y-8">
 
             {/* PERSONAL INFO */}
+
             <div className="bg-white rounded-2xl shadow-lg p-6">
 
               <h2 className="text-2xl font-bold mb-6">
@@ -208,42 +236,6 @@ export default function LecturerProfilePage() {
               </h2>
 
               <div className="space-y-4">
-
-                <div>
-
-                  <p className="text-slate-500 text-sm">
-                    Full Name
-                  </p>
-
-                  <p className="font-semibold">
-                    {lecturer.fullName}
-                  </p>
-
-                </div>
-
-                <div>
-
-                  <p className="text-slate-500 text-sm">
-                    Initials
-                  </p>
-
-                  <p className="font-semibold">
-                    {lecturer.initials}
-                  </p>
-
-                </div>
-
-                <div>
-
-                  <p className="text-slate-500 text-sm">
-                    Gender
-                  </p>
-
-                  <p className="font-semibold">
-                    {lecturer.gender}
-                  </p>
-
-                </div>
 
                 <div>
 
@@ -269,154 +261,211 @@ export default function LecturerProfilePage() {
 
                 </div>
 
+                <div>
+
+                  <p className="text-slate-500 text-sm">
+                    Qualification
+                  </p>
+
+                  <p className="font-semibold">
+                    {lecturer.qualification}
+                  </p>
+
+                </div>
+
+              </div>
+
+            </div>
+
+            {/* STATISTICS */}
+
+            <div className="bg-white rounded-2xl shadow-lg p-6">
+
+              <h2 className="text-2xl font-bold mb-6">
+                Teaching Statistics
+              </h2>
+
+              <div className="space-y-4">
+
+                <div>
+
+                  <p className="text-slate-500 text-sm">
+                    Assigned Modules
+                  </p>
+
+                  <p className="text-3xl font-bold">
+                    {modules.length}
+                  </p>
+
+                </div>
+
+                <div>
+
+                  <p className="text-slate-500 text-sm">
+                    Weekly Sessions
+                  </p>
+
+                  <p className="text-3xl font-bold">
+                    {timetable.length}
+                  </p>
+
+                </div>
+
               </div>
 
             </div>
 
           </div>
 
-          {/* RIGHT COLUMN */}
+          {/* RIGHT */}
+
           <div className="xl:col-span-2 space-y-8">
 
-            {/* ACADEMIC DETAILS */}
+            {/* MODULES */}
+
             <div className="bg-white rounded-2xl shadow-lg p-6">
 
               <h2 className="text-2xl font-bold mb-6">
-                Academic Information
+
+                Assigned Modules
+
               </h2>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="overflow-x-auto">
 
-                <div
-                  className="
-                    bg-slate-100
-                    rounded-xl
-                    p-6
-                  "
-                >
+                <table className="w-full">
 
-                  <p className="text-slate-500 text-sm mb-2">
-                    Department
-                  </p>
+                  <thead>
 
-                  <h3 className="text-2xl font-bold">
-                    {lecturer.department}
-                  </h3>
+                    <tr className="bg-slate-900 text-white">
 
-                </div>
+                      <th className="p-4 text-left">
+                        Module Code
+                      </th>
 
-                <div
-                  className="
-                    bg-slate-100
-                    rounded-xl
-                    p-6
-                  "
-                >
+                      <th className="p-4 text-left">
+                        Module Name
+                      </th>
 
-                  <p className="text-slate-500 text-sm mb-2">
-                    Designation
-                  </p>
+                    </tr>
 
-                  <h3 className="text-2xl font-bold">
-                    {lecturer.designation}
-                  </h3>
+                  </thead>
 
-                </div>
-
-                <div
-                  className="
-                    bg-slate-100
-                    rounded-xl
-                    p-6
-                  "
-                >
-
-                  <p className="text-slate-500 text-sm mb-2">
-                    Qualification
-                  </p>
-
-                  <h3 className="text-2xl font-bold">
-                    {lecturer.qualification}
-                  </h3>
-
-                </div>
-
-                <div
-                  className="
-                    bg-slate-100
-                    rounded-xl
-                    p-6
-                  "
-                >
-
-                  <p className="text-slate-500 text-sm mb-2">
-                    Status
-                  </p>
-
-                  <h3 className="text-2xl font-bold">
+                  <tbody>
 
                     {
-                      lecturer.active
-                        ? "Active"
-                        : "Inactive"
+                      modules.map((module) => (
+
+                        <tr
+                          key={module.id}
+                          className="border-b"
+                        >
+
+                          <td className="p-4">
+
+                            {module.moduleCode}
+
+                          </td>
+
+                          <td className="p-4">
+
+                            {module.moduleName}
+
+                          </td>
+
+                        </tr>
+                      ))
                     }
 
-                  </h3>
+                  </tbody>
 
-                </div>
+                </table>
 
               </div>
 
             </div>
 
-            {/* SYSTEM STATUS */}
+            {/* TIMETABLE */}
+
             <div className="bg-white rounded-2xl shadow-lg p-6">
 
               <h2 className="text-2xl font-bold mb-6">
-                System Status
+
+                Weekly Timetable
+
               </h2>
 
-              <div
-                className="
-                  flex
-                  items-center
-                  justify-between
-                  bg-slate-900
-                  text-white
-                  rounded-2xl
-                  p-8
-                "
-              >
+              <div className="overflow-x-auto">
 
-                <div>
+                <table className="w-full">
 
-                  <p className="text-slate-300 mb-2">
-                    Current Role
-                  </p>
+                  <thead>
 
-                  <h1 className="text-4xl font-bold">
-                    Lecturer
-                  </h1>
+                    <tr className="bg-slate-900 text-white">
 
-                </div>
+                      <th className="p-4 text-left">
+                        Day
+                      </th>
 
-                <div className="text-right">
+                      <th className="p-4 text-left">
+                        Time
+                      </th>
 
-                  <p className="text-slate-300 mb-2">
-                    Account Status
-                  </p>
+                      <th className="p-4 text-left">
+                        Module
+                      </th>
 
-                  <h2 className="text-2xl font-semibold">
+                      <th className="p-4 text-left">
+                        Venue
+                      </th>
+
+                    </tr>
+
+                  </thead>
+
+                  <tbody>
 
                     {
-                      lecturer.active
-                        ? "Active"
-                        : "Disabled"
+                      timetable.map((item) => (
+
+                        <tr
+                          key={item.id}
+                          className="border-b"
+                        >
+
+                          <td className="p-4">
+                            {item.day}
+                          </td>
+
+                          <td className="p-4">
+
+                            {item.startTime}
+                            {" - "}
+                            {item.endTime}
+
+                          </td>
+
+                          <td className="p-4">
+
+                            {item.moduleCode}
+                            {" - "}
+                            {item.moduleName}
+
+                          </td>
+
+                          <td className="p-4">
+
+                            {item.venue}
+
+                          </td>
+
+                        </tr>
+                      ))
                     }
 
-                  </h2>
+                  </tbody>
 
-                </div>
+                </table>
 
               </div>
 
