@@ -29,6 +29,10 @@ export default function Sidebar() {
 
   const menuSections = [
 
+    // =====================================
+    // MAIN
+    // =====================================
+
     {
       title: "MAIN",
 
@@ -40,6 +44,10 @@ export default function Sidebar() {
         }
       ]
     },
+
+    // =====================================
+    // ACADEMIC MANAGEMENT
+    // =====================================
 
     {
       title: "ACADEMIC MANAGEMENT",
@@ -78,6 +86,10 @@ export default function Sidebar() {
       ]
     },
 
+    // =====================================
+    // ALLOCATION
+    // =====================================
+
     {
       title: "ALLOCATION",
 
@@ -89,6 +101,10 @@ export default function Sidebar() {
         }
       ]
     },
+
+    // =====================================
+    // ACADEMIC OPERATIONS
+    // =====================================
 
     {
       title: "ACADEMIC OPERATIONS",
@@ -106,6 +122,11 @@ export default function Sidebar() {
         },
 
         {
+          name: "Attendance Management",
+          path: "/attendance-management"
+        },
+
+        {
           name: "Admin Approval",
           path: "/admin-approval"
         },
@@ -115,20 +136,15 @@ export default function Sidebar() {
           path: "/timetable-rules"
         },
 
-          {
+        {
           name: "Generate Timetable",
           path: "/timetable-generation"
         },
 
         {
-          name:" Halls Management",
-          path:"/halls"
+          name: "Halls Management",
+          path: "/halls"
         }
-
-
-
-
-        
       ]
     }
   ];
@@ -162,11 +178,15 @@ export default function Sidebar() {
       <div className="mb-10">
 
         <h1 className="text-3xl font-bold">
+
           FAS
+
         </h1>
 
         <p className="text-slate-400 text-sm mt-2">
+
           Faculty of Applied Sciences
+
         </p>
 
       </div>

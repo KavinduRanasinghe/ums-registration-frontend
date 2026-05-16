@@ -56,6 +56,9 @@ import HallManagementPage
 import ResultsManagementPage
   from "../pages/ResultsManagementPage";
 
+import AttendanceManagementPage
+  from "../pages/AttendanceManagementPage";
+
 // =========================================
 // PROTECTED ROUTE
 // =========================================
@@ -373,6 +376,44 @@ export default function AppRoutes() {
             </ProtectedRoute>
           }
         />
+
+        {/* ================================= */}
+      {/* RESULTS */}
+      {/* ================================= */}
+
+      <Route
+        path="/results-management"
+        element={
+          <ProtectedRoute>
+
+            <MainLayout>
+
+              <ResultsManagementPage />
+
+            </MainLayout>
+
+          </ProtectedRoute>
+        }
+      />
+
+      {/* ================================= */}
+      {/* ATTENDANCE MANAGEMENT */}
+      {/* ================================= */}
+
+      <Route
+        path="/attendance-management"
+        element={
+          <ProtectedRoute>
+
+            <MainLayout>
+
+              <AttendanceManagementPage />
+
+            </MainLayout>
+
+          </ProtectedRoute>
+        }
+      />
 
       </Routes>
 
