@@ -113,7 +113,13 @@ export default function Sidebar() {
           {
           name: "Generate Timetable",
           path: "/timetable-generation"
+        },
+
+        {
+          name:" Halls Management",
+          path:"/halls"
         }
+
 
 
 

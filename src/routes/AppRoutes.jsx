@@ -45,6 +45,7 @@ import LecturerModuleAssignmentPage
 import TimeTableRulesPage 
   from "../pages/TimeTableRulesPage";
 import TimetableGenerationPage from "../pages/TimetableGenerationPage";
+import HallManagementPage from "../pages/HallManagementPage";
 
 
 // =========================================
@@ -244,6 +245,11 @@ export default function AppRoutes() {
         <Route
           path="/timetable-generation"
           element={<TimetableGenerationPage />}
+        />
+
+        <Route
+        path="/halls"
+        element={<HallManagementPage />}
         />
 
        
