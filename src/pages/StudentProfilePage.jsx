@@ -27,11 +27,14 @@ export default function StudentProfilePage() {
   const [modules, setModules] =
     useState([]);
 
+  const [results, setResults] =
+    useState([]);
+
   const [loading, setLoading] =
     useState(true);
 
   // =====================================
-  // LOAD STUDENT
+  // LOAD DATA
   // =====================================
 
   useEffect(() => {
@@ -44,25 +47,43 @@ export default function StudentProfilePage() {
 
     try {
 
+      // =====================================
       // STUDENT
+      // =====================================
 
       const response =
         await api.get(
           `/student-registration/${regNo}`
         );
 
-      setStudent(response.data);
+      setStudent(
+        response.data
+      );
 
-      // MODULES
+      // =====================================
+      // REGISTERED MODULES
+      // =====================================
 
       const moduleResponse =
         await api.get(
-
           `/registered-modules/student/${regNo}`
         );
 
       setModules(
         moduleResponse.data
+      );
+
+      // =====================================
+      // RESULTS
+      // =====================================
+
+      const resultsResponse =
+        await api.get(
+          `/results/${regNo}`
+        );
+
+      setResults(
+        resultsResponse.data
       );
 
     } catch (error) {
@@ -81,22 +102,26 @@ export default function StudentProfilePage() {
 
   const calculateGPA = () => {
 
-    if (modules.length === 0)
+    if (results.length === 0)
       return "0.00";
 
     let totalPoints = 0;
 
     let totalCredits = 0;
 
-    modules.forEach((m) => {
+    results.forEach((result) => {
 
-      if (m.gpaPoint && m.credits) {
+      if (
+        result.gpaPoint &&
+        result.credits
+      ) {
 
         totalPoints +=
-          m.gpaPoint * m.credits;
+          result.gpaPoint *
+          result.credits;
 
         totalCredits +=
-          m.credits;
+          result.credits;
       }
     });
 
@@ -106,6 +131,26 @@ export default function StudentProfilePage() {
     return (
       totalPoints / totalCredits
     ).toFixed(2);
+  };
+
+  // =====================================
+  // ACADEMIC STANDING
+  // =====================================
+
+  const getAcademicStanding = () => {
+
+    const gpa =
+      parseFloat(
+        calculateGPA()
+      );
+
+    if (gpa >= 3.5)
+      return "Dean's List";
+
+    if (gpa >= 2.0)
+      return "Good Standing";
+
+    return "Academic Warning";
   };
 
   // =====================================
@@ -119,7 +164,9 @@ export default function StudentProfilePage() {
       <div className="min-h-screen flex items-center justify-center">
 
         <h1 className="text-2xl font-bold">
+
           Loading Student Profile...
+
         </h1>
 
       </div>
@@ -127,7 +174,7 @@ export default function StudentProfilePage() {
   }
 
   // =====================================
-  // NO STUDENT
+  // STUDENT NOT FOUND
   // =====================================
 
   if (!student) {
@@ -137,7 +184,9 @@ export default function StudentProfilePage() {
       <div className="min-h-screen flex items-center justify-center">
 
         <h1 className="text-2xl font-bold text-red-600">
+
           Student Not Found
+
         </h1>
 
       </div>
@@ -154,7 +203,9 @@ export default function StudentProfilePage() {
 
       <div className="max-w-7xl mx-auto">
 
+        {/* ================================= */}
         {/* HEADER */}
+        {/* ================================= */}
 
         <div className="bg-white rounded-2xl shadow-lg p-8 mb-8">
 
@@ -181,7 +232,7 @@ export default function StudentProfilePage() {
 
             </div>
 
-            {/* BASIC DETAILS */}
+            {/* DETAILS */}
 
             <div className="flex-1">
 
@@ -201,6 +252,8 @@ export default function StudentProfilePage() {
 
               <div className="flex flex-wrap gap-3 mt-4">
 
+                {/* COMBINATION */}
+
                 <span
                   className="
                     bg-blue-100
@@ -213,10 +266,14 @@ export default function StudentProfilePage() {
                   "
                 >
 
-                  {student.assignedCombination ||
-                    "Not Allocated"}
+                  {
+                    student.assignedCombination ||
+                    "Not Allocated"
+                  }
 
                 </span>
+
+                {/* LEVEL */}
 
                 <span
                   className="
@@ -233,6 +290,8 @@ export default function StudentProfilePage() {
                   Level {student.level}
 
                 </span>
+
+                {/* GPA */}
 
                 <span
                   className="
@@ -258,11 +317,15 @@ export default function StudentProfilePage() {
 
         </div>
 
+        {/* ================================= */}
         {/* CONTENT */}
+        {/* ================================= */}
 
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
 
-          {/* LEFT */}
+          {/* ================================= */}
+          {/* LEFT SIDE */}
+          {/* ================================= */}
 
           <div className="space-y-8">
 
@@ -271,7 +334,9 @@ export default function StudentProfilePage() {
             <div className="bg-white rounded-2xl shadow-lg p-6">
 
               <h2 className="text-2xl font-bold mb-6">
+
                 Personal Information
+
               </h2>
 
               <div className="space-y-4">
@@ -333,10 +398,12 @@ export default function StudentProfilePage() {
             <div className="bg-white rounded-2xl shadow-lg p-6">
 
               <h2 className="text-2xl font-bold mb-6">
+
                 Academic Status
+
               </h2>
 
-              <div className="space-y-4">
+              <div className="space-y-5">
 
                 <div>
 
@@ -353,6 +420,20 @@ export default function StudentProfilePage() {
                   >
 
                     {calculateGPA()}
+
+                  </p>
+
+                </div>
+
+                <div>
+
+                  <p className="text-slate-500 text-sm">
+                    Academic Standing
+                  </p>
+
+                  <p className="font-semibold text-lg">
+
+                    {getAcademicStanding()}
 
                   </p>
 
@@ -388,19 +469,41 @@ export default function StudentProfilePage() {
 
           </div>
 
-          {/* RIGHT */}
+          {/* ================================= */}
+          {/* RIGHT SIDE */}
+          {/* ================================= */}
 
           <div className="xl:col-span-2 space-y-8">
 
-            {/* MODULES */}
+            {/* RESULTS TABLE */}
 
             <div className="bg-white rounded-2xl shadow-lg p-6">
 
-              <h2 className="text-2xl font-bold mb-6">
+              <div className="flex justify-between items-center mb-6">
 
-                Registered Modules & Results
+                <h2 className="text-2xl font-bold">
 
-              </h2>
+                  Registered Modules & Results
+
+                </h2>
+
+                <div
+                  className="
+                    bg-slate-100
+                    px-4
+                    py-2
+                    rounded-xl
+                    font-semibold
+                  "
+                >
+
+                  Total Results:
+                  {" "}
+                  {results.length}
+
+                </div>
+
+              </div>
 
               <div className="overflow-x-auto">
 
@@ -437,71 +540,179 @@ export default function StudentProfilePage() {
                   <tbody>
 
                     {
-                      modules.map((module) => (
+                      results.length > 0 ? (
 
-                        <tr
-                          key={module.id}
+                        results.map((result) => (
 
-                          className="border-b"
-                        >
+                          <tr
+                            key={result.id}
 
-                          <td className="p-4">
+                            className="
+                              border-b
+                              hover:bg-slate-50
+                            "
+                          >
 
-                            {module.moduleCode}
+                            <td className="p-4 font-semibold">
 
-                          </td>
+                              {result.moduleCode}
 
-                          <td className="p-4">
+                            </td>
 
-                            {module.moduleName}
+                            <td className="p-4">
 
-                          </td>
+                              {result.moduleName}
 
-                          <td className="p-4">
+                            </td>
 
-                            {module.credits}
+                            <td className="p-4">
 
-                          </td>
+                              {result.credits}
 
-                          <td className="p-4">
+                            </td>
 
-                            <span
-                              className="
-                                bg-green-100
-                                text-green-700
-                                px-3
-                                py-1
-                                rounded-full
-                                text-xs
-                                font-semibold
-                              "
-                            >
+                            <td className="p-4">
 
-                              {
-                                module.grade ||
-                                "Pending"
-                              }
+                              <span
+                                className="
+                                  bg-green-100
+                                  text-green-700
+                                  px-3
+                                  py-1
+                                  rounded-full
+                                  text-xs
+                                  font-semibold
+                                "
+                              >
 
-                            </span>
+                                {result.grade}
 
-                          </td>
+                              </span>
 
-                          <td className="p-4 font-semibold">
+                            </td>
 
-                            {
-                              module.gpaPoint ||
-                              "-"
-                            }
+                            <td className="p-4 font-bold">
+
+                              {result.gpaPoint}
+
+                            </td>
+
+                          </tr>
+                        ))
+
+                      ) : (
+
+                        <tr>
+
+                          <td
+                            colSpan="5"
+
+                            className="
+                              text-center
+                              p-8
+                              text-slate-500
+                            "
+                          >
+
+                            No Results Available
 
                           </td>
 
                         </tr>
-                      ))
+                      )
                     }
 
                   </tbody>
 
                 </table>
+
+              </div>
+
+            </div>
+
+            {/* SEMESTER PERFORMANCE */}
+
+            <div className="bg-white rounded-2xl shadow-lg p-6">
+
+              <h2 className="text-2xl font-bold mb-6">
+
+                Semester Performance
+
+              </h2>
+
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+
+                <div className="bg-slate-100 rounded-xl p-6">
+
+                  <p className="text-slate-500 text-sm">
+                    GPA
+                  </p>
+
+                  <h1 className="text-4xl font-bold mt-2">
+
+                    {calculateGPA()}
+
+                  </h1>
+
+                </div>
+
+                <div className="bg-slate-100 rounded-xl p-6">
+
+                  <p className="text-slate-500 text-sm">
+                    Credits Earned
+                  </p>
+
+                  <h1 className="text-4xl font-bold mt-2">
+
+                    {
+                      results.reduce(
+
+                        (sum, result) =>
+
+                          sum + result.credits,
+
+                        0
+                      )
+                    }
+
+                  </h1>
+
+                </div>
+
+                <div className="bg-slate-100 rounded-xl p-6">
+
+                  <p className="text-slate-500 text-sm">
+                    Completed Modules
+                  </p>
+
+                  <h1 className="text-4xl font-bold mt-2">
+
+                    {results.length}
+
+                  </h1>
+
+                </div>
+
+                <div className="bg-slate-100 rounded-xl p-6">
+
+                  <p className="text-slate-500 text-sm">
+                    Academic Standing
+                  </p>
+
+                  <h1
+                    className="
+                      text-xl
+                      font-bold
+                      mt-4
+                      text-green-600
+                    "
+                  >
+
+                    {getAcademicStanding()}
+
+                  </h1>
+
+                </div>
 
               </div>
 

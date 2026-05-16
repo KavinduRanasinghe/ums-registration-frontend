@@ -69,6 +69,11 @@ export default function Sidebar() {
         {
           name: "Lecturer Modules",
           path: "/lecturer-module-assignment"
+        },
+
+        {
+          name: "Results Management",
+          path: "/results-management"
         }
       ]
     },

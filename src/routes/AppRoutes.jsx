@@ -29,24 +29,32 @@ import AdminApprovalPage
 import ModuleManagementPage
   from "../pages/ModuleManagementPage";
 
-import LecturerRegistrationPage 
+import LecturerRegistrationPage
   from "../pages/LecturerRegistrationPage";
 
 import StudentProfilePage
   from "../pages/StudentProfilePage";
-import LecturersPage from "../pages/LecturersPage";
+
+import LecturersPage
+  from "../pages/LecturersPage";
 
 import LecturerProfilePage
   from "../pages/LecturerProfilePage";
 
-import LecturerModuleAssignmentPage 
+import LecturerModuleAssignmentPage
   from "../pages/LecturerModuleAssignmentPage";
 
-import TimeTableRulesPage 
+import TimeTableRulesPage
   from "../pages/TimeTableRulesPage";
-import TimetableGenerationPage from "../pages/TimetableGenerationPage";
-import HallManagementPage from "../pages/HallManagementPage";
 
+import TimetableGenerationPage
+  from "../pages/TimetableGenerationPage";
+
+import HallManagementPage
+  from "../pages/HallManagementPage";
+
+import ResultsManagementPage
+  from "../pages/ResultsManagementPage";
 
 // =========================================
 // PROTECTED ROUTE
@@ -65,7 +73,6 @@ function ProtectedRoute({ children }) {
   return children;
 }
 
-
 // =========================================
 // APP ROUTES
 // =========================================
@@ -79,7 +86,7 @@ export default function AppRoutes() {
       <Routes>
 
         {/* ================================= */}
-        {/* PUBLIC ROUTE */}
+        {/* PUBLIC ROUTES */}
         {/* ================================= */}
 
         <Route
@@ -88,7 +95,7 @@ export default function AppRoutes() {
         />
 
         {/* ================================= */}
-        {/* PROTECTED ROUTES */}
+        {/* DASHBOARD */}
         {/* ================================= */}
 
         <Route
@@ -105,6 +112,10 @@ export default function AppRoutes() {
             </ProtectedRoute>
           }
         />
+
+        {/* ================================= */}
+        {/* STUDENTS */}
+        {/* ================================= */}
 
         <Route
           path="/student-registration"
@@ -137,13 +148,13 @@ export default function AppRoutes() {
         />
 
         <Route
-          path="/allocation"
+          path="/students/:regNo"
           element={
             <ProtectedRoute>
 
               <MainLayout>
 
-                <AllocationPage />
+                <StudentProfilePage />
 
               </MainLayout>
 
@@ -151,75 +162,53 @@ export default function AppRoutes() {
           }
         />
 
-        <Route
-          path="/course-registration"
-          element={
-            <ProtectedRoute>
-
-              <MainLayout>
-
-                <CourseRegistrationPage />
-
-              </MainLayout>
-
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/admin-approval"
-          element={
-            <ProtectedRoute>
-
-              <MainLayout>
-
-                <AdminApprovalPage />
-
-              </MainLayout>
-
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/modules-management"
-          element={
-            <ProtectedRoute>
-
-              <MainLayout>
-
-                <ModuleManagementPage />
-
-              </MainLayout>
-
-            </ProtectedRoute>
-          }
-        />
+        {/* ================================= */}
+        {/* LECTURERS */}
+        {/* ================================= */}
 
         <Route
           path="/lecturer-registration"
           element={
             <ProtectedRoute>
+
               <MainLayout>
+
                 <LecturerRegistrationPage />
+
               </MainLayout>
+
             </ProtectedRoute>
           }
         />
 
         <Route
-          path="/students/:regNo"
-          element={<StudentProfilePage />}
+          path="/lecturers"
+          element={
+            <ProtectedRoute>
+
+              <MainLayout>
+
+                <LecturersPage />
+
+              </MainLayout>
+
+            </ProtectedRoute>
+          }
         />
 
         <Route
-          path="/lecturers/:id"
-          element={<LecturerProfilePage />}
-        />  
-        
-        <Route
-          path="/lecturers"
-          element={<LecturersPage />}
+          path="/lecturers/:lecturerId"
+          element={
+            <ProtectedRoute>
+
+              <MainLayout>
+
+                <LecturerProfilePage />
+
+              </MainLayout>
+
+            </ProtectedRoute>
+          }
         />
 
         <Route
@@ -237,26 +226,155 @@ export default function AppRoutes() {
           }
         />
 
-         <Route
+        {/* ================================= */}
+        {/* MODULES */}
+        {/* ================================= */}
+
+        <Route
+          path="/modules-management"
+          element={
+            <ProtectedRoute>
+
+              <MainLayout>
+
+                <ModuleManagementPage />
+
+              </MainLayout>
+
+            </ProtectedRoute>
+          }
+        />
+
+        {/* ================================= */}
+        {/* ALLOCATION */}
+        {/* ================================= */}
+
+        <Route
+          path="/allocation"
+          element={
+            <ProtectedRoute>
+
+              <MainLayout>
+
+                <AllocationPage />
+
+              </MainLayout>
+
+            </ProtectedRoute>
+          }
+        />
+
+        {/* ================================= */}
+        {/* COURSE REGISTRATION */}
+        {/* ================================= */}
+
+        <Route
+          path="/course-registration"
+          element={
+            <ProtectedRoute>
+
+              <MainLayout>
+
+                <CourseRegistrationPage />
+
+              </MainLayout>
+
+            </ProtectedRoute>
+          }
+        />
+
+        {/* ================================= */}
+        {/* ADMIN APPROVAL */}
+        {/* ================================= */}
+
+        <Route
+          path="/admin-approval"
+          element={
+            <ProtectedRoute>
+
+              <MainLayout>
+
+                <AdminApprovalPage />
+
+              </MainLayout>
+
+            </ProtectedRoute>
+          }
+        />
+
+        {/* ================================= */}
+        {/* TIMETABLE */}
+        {/* ================================= */}
+
+        <Route
           path="/timetable-rules"
-          element={<TimeTableRulesPage />}
+          element={
+            <ProtectedRoute>
+
+              <MainLayout>
+
+                <TimeTableRulesPage />
+
+              </MainLayout>
+
+            </ProtectedRoute>
+          }
         />
 
         <Route
           path="/timetable-generation"
-          element={<TimetableGenerationPage />}
+          element={
+            <ProtectedRoute>
+
+              <MainLayout>
+
+                <TimetableGenerationPage />
+
+              </MainLayout>
+
+            </ProtectedRoute>
+          }
         />
+
+        {/* ================================= */}
+        {/* HALLS */}
+        {/* ================================= */}
 
         <Route
-        path="/halls"
-        element={<HallManagementPage />}
+          path="/halls"
+          element={
+            <ProtectedRoute>
+
+              <MainLayout>
+
+                <HallManagementPage />
+
+              </MainLayout>
+
+            </ProtectedRoute>
+          }
         />
 
-       
+        {/* ================================= */}
+        {/* RESULTS */}
+        {/* ================================= */}
+
+        <Route
+          path="/results-management"
+          element={
+            <ProtectedRoute>
+
+              <MainLayout>
+
+                <ResultsManagementPage />
+
+              </MainLayout>
+
+            </ProtectedRoute>
+          }
+        />
 
       </Routes>
-
-
 
     </BrowserRouter>
   );
