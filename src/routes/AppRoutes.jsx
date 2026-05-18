@@ -59,6 +59,12 @@ import ResultsManagementPage
 import AttendanceManagementPage
   from "../pages/AttendanceManagementPage";
 
+import AttendanceAnalyticsPage
+  from "../pages/AttendanceAnalyticsPage";
+
+import AttendanceScannerPage
+  from "../pages/AttendanceScannerPage";
+
 // =========================================
 // PROTECTED ROUTE
 // =========================================
@@ -408,6 +414,36 @@ export default function AppRoutes() {
             <MainLayout>
 
               <AttendanceManagementPage />
+
+            </MainLayout>
+
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/attendance-analytics"
+        element={
+          <ProtectedRoute>
+
+            <MainLayout>
+
+              <AttendanceAnalyticsPage />
+
+            </MainLayout>
+
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/attendance-scanner"
+        element={
+          <ProtectedRoute>
+
+            <MainLayout>
+
+              <AttendanceScannerPage />
 
             </MainLayout>
 

@@ -144,7 +144,16 @@ export default function Sidebar() {
         {
           name: "Halls Management",
           path: "/halls"
-        }
+        },
+        {
+          name: "Attendance Analytics",
+          path: "/attendance-analytics"
+        },
+
+        {
+          name: "Attendance Scanner",
+          path: "/attendance-scanner"
+        },
       ]
     }
   ];
